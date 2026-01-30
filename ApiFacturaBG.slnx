@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="ApiFacturaBG/ApiFacturaBG.csproj" />
+  <Project Path="Application/Application.csproj" />
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" />
+  <Project Path="Models/Models.csproj" />
+</Solution>
