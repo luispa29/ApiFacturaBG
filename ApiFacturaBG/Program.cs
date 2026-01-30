@@ -1,3 +1,5 @@
+using Application.Ports.Driving;
+using Domain.Services;
 using MapSql.Extensions;
 using Microsoft.Extensions.Configuration;
 using Models.Utils;
@@ -26,6 +28,21 @@ configuration.GetSection("Security").Bind(securitySettings);
 
 // 2. Configuración de servicios
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+// Inyección de dependencias - Servicios de Seguridad
+builder.Services.AddSingleton<IAesEncryptionService, AesEncryptionService>();
+builder.Services.AddSingleton<IJwtService, JwtService>();
+
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,6 +53,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="MapSql" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
