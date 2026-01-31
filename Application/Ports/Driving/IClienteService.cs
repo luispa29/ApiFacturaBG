@@ -7,5 +7,6 @@ namespace Application.Ports.Driving
     {
         Task<(int id, string mensaje)> CrearCliente(ClienteRequest clienteRequest);
         Task<(int id, string mensaje)> EditarCliente(ClienteRequest clienteRequest);
+        Task<(int id, string mensaje)> EliminarCliente(int clienteID);
     }
 }

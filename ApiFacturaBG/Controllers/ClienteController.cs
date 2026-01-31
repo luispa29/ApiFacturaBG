@@ -48,5 +48,24 @@ namespace ApiFacturaBG.Controllers
                 return StatusCode(500, RespuestaApi<object>.Error($"Error al editar cliente: {ex.Message}"));
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var (eliminado, mensaje) = await _clienteSrvc.EliminarCliente(id);
+
+                if (eliminado == 0)
+                {
+                    return BadRequest(RespuestaApi<object>.Error(mensaje));
+                }
+                return Ok(RespuestaApi<object>.Exitosa(new { Id = eliminado }, mensaje));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, RespuestaApi<object>.Error($"Error al eliminar cliente: {ex.Message}"));
+            }
+        }
     }
 }

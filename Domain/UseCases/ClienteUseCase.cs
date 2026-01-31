@@ -85,6 +85,34 @@ namespace Domain.UseCases
 
         }
 
+        public async Task<(int id, string mensaje)> EliminarCliente(int clienteID)
+        {
+            try
+            {
+                var existeId = await ValidarIdExistente(clienteID);
+
+                if (existeId.Length > 0)
+                {
+                    return (0, existeId);
+                }
+
+                var eliminar = await _sqlPort.ExecuteNonQueryAsync("SP_Cliente_Eliminar", new { ClienteID = clienteID, EliminacionFisica = false });
+                if (eliminar > 0)
+                {
+                    return (eliminar, "Cliente eliminado exitosamente.");
+                }
+                else
+                {
+                    return (0, "No se pudo eliminar el cliente.");
+                }
+            }
+            catch (Exception)
+            {
+
+                return (0, "Ocurrió un error inesperado al procesar la solicitud.");
+            }
+        }
+
         public static string ValidarClienteRequest(ClienteRequest clienteRequest, bool editar = false)
         {
             var errores = new List<string>();

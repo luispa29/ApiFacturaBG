@@ -34,3 +34,24 @@ BEGIN
     SELECT @@ROWCOUNT AS FilasAfectadas;
 END
 GO
+
+CREATE OR ALTER PROCEDURE SP_Cliente_Eliminar
+    @ClienteID INT,
+    @EliminacionFisica BIT = 0
+AS
+BEGIN
+    
+    IF @EliminacionFisica = 1
+    BEGIN
+        DELETE FROM dbo.Clientes WHERE ClienteID = @ClienteID;
+    END
+    ELSE
+    BEGIN
+        UPDATE dbo.Clientes
+        SET Activo = 0
+        WHERE ClienteID = @ClienteID;
+    END
+    
+    SELECT @@ROWCOUNT AS FilasAfectadas;
+END
+GO
