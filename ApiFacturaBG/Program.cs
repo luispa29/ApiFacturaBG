@@ -39,7 +39,7 @@ builder.Services.AddSingleton<IJwtService, JwtService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioUseCase>();
 builder.Services.AddScoped<ILoginService, LoginUseCase>();
 builder.Services.AddScoped<IProductoService, ProductoUseCase>();
-
+builder.Services.AddScoped<IClienteService, ClienteUseCase>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
