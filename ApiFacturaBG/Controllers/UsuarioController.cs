@@ -8,7 +8,7 @@ using Models.Response;
 
 namespace ApiFacturaBG.Controllers
 {
-   [JwtAuthorization]
+    [JwtAuthorization]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuarioController(IUsuarioService _usuarioSrvc) : ControllerBase
@@ -33,7 +33,7 @@ namespace ApiFacturaBG.Controllers
                 return StatusCode(500, RespuestaApi<object>.Error($"Error al crear usuario: {ex.Message}"));
             }
         }
-        
+
         [HttpPut]
         public async Task<IActionResult> Edit([FromBody] UsuarioUpdateRequest usuario)
         {
@@ -70,6 +70,34 @@ namespace ApiFacturaBG.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, RespuestaApi<object>.Error($"Error al eliminar usuario: {ex.Message}"));
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
+           [FromQuery] string? filtro = null,
+           [FromQuery] int numeroPagina = 1,
+           [FromQuery] int tamanoPagina = 10,
+           [FromQuery] bool soloActivos = true
+            )
+        {
+            try
+            {
+                var (usuarios, total) = await _usuarioSrvc.Obtener(numeroPagina, tamanoPagina, filtro, soloActivos);
+
+                var pagination = new
+                {
+                    Page = numeroPagina,
+                    PageSize = tamanoPagina,
+                    TotalRecords = total,
+                    TotalPages = (int)Math.Ceiling(total / (double)tamanoPagina)
+                };
+
+                return Ok(RespuestaApi<object>.ExitosaConPaginacion(usuarios, total, numeroPagina, tamanoPagina, "usuarios obtenidos exitosamente"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, RespuestaApi<object>.Error($"Error al obtener usuarios: {ex.Message}"));
             }
         }
     }

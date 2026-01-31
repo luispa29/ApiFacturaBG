@@ -78,19 +78,8 @@ BEGIN
     OFFSET @Offset ROWS
     FETCH NEXT @TamanoPagina ROWS ONLY;
 
-    SELECT 
-        COUNT(*) as TotalUsuarios,
-        COUNT(CASE WHEN Activo = 1 THEN 1 END) as UsuariosActivos,
-        COUNT(CASE WHEN Activo = 0 THEN 1 END) as UsuariosInactivos
-    FROM dbo.Usuarios
-    WHERE 
-        (@Filtro IS NULL OR 
-         Username LIKE '%' + @Filtro + '%' OR 
-         Nombre LIKE '%' + @Filtro + '%' OR 
-         Email LIKE '%' + @Filtro + '%')
-        AND (@SoloActivos IS NULL OR Activo = @SoloActivos);
-
-    SELECT COUNT(*) as TotalRegistros
+   
+    SELECT COUNT(*) as Total
     FROM dbo.Usuarios
     WHERE 
         (@Filtro IS NULL OR 

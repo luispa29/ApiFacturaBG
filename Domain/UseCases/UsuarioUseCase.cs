@@ -2,6 +2,8 @@
 using Application.Ports.Driving;
 using Microsoft.AspNetCore.Components.Forms;
 using Models.Request;
+using Models.Response;
+using Models.Utils;
 
 namespace Domain.UseCases
 {
@@ -172,6 +174,34 @@ namespace Domain.UseCases
             {
 
                 return (0, "Ocurrió un error inesperado al procesar la solicitud.");
+            }
+        }
+
+        public async Task<(List<UsuarioResponse> usuarios, int totalRegistros)> Obtener(int numeroPagina, int tamanoPagina, string filtro, bool soloActivos)
+        {
+            try
+            {
+                var resultTypes = new Type[] { typeof(UsuarioResponse), typeof(TotalRegistros) };
+
+                var results = await _sqlPort.ExecuteStoredProcedureMultipleAsync(
+                    "SP_Usuario_Listar",
+                    resultTypes,
+                     new
+                     {
+                         NumeroPagina = numeroPagina,
+                         TamanoPagina = tamanoPagina,
+                         Filtro = filtro,
+                         SoloActivos = soloActivos
+                     });
+                var usuarios = results[0].Cast<UsuarioResponse>().ToList();
+                var totalRegistros = (results[1].FirstOrDefault() as TotalRegistros)?.Total ?? 0;
+                return (usuarios, totalRegistros);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
     }
