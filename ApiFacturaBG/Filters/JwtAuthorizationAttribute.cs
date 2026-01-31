@@ -22,7 +22,7 @@ namespace ApiCobrApp.Filters
             var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
             if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                context.Result = new JsonResult(RespuestaApi<object>.Error("Token de autorización no proporcionado")) { StatusCode = 401 };
+                context.Result = new JsonResult(RespuestaApi<object>.Error("Token de autorización no proporcionado",401)) { StatusCode = 401 };
                 return;
             }
 

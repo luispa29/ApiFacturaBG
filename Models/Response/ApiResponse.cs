@@ -38,7 +38,7 @@ namespace Models.Response
             };
         }
 
-        public static RespuestaApi<T> ConError(string mensaje, int codigo = 500)
+        public static RespuestaApi<T> Error(string mensaje, int codigo = 500)
         {
             return new RespuestaApi<T>
             {
