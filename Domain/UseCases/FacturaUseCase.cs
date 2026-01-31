@@ -74,6 +74,31 @@ namespace Domain.UseCases
             }
         }
 
+        public async Task<FacturaResponse?> ObtenerPorID(int facturaID)
+        {
+            try
+            {
+                var parameter = new { FacturaID = facturaID };
+                var resultTypes = new[] { typeof(FacturaResponse), typeof(FacturaDetalleResponse), typeof(FacturaPagoResponse) };
+
+                var results = await _sqlPort.ExecuteStoredProcedureMultipleAsync("SP_Factura_ObtenerPorID", resultTypes, parameter);
+
+                var factura = results[0].Cast<FacturaResponse>().FirstOrDefault();
+
+                if (factura != null)
+                {
+                    factura.Detalles = results[1].Cast<FacturaDetalleResponse>().ToList();
+                    factura.Pagos = results[2].Cast<FacturaPagoResponse>().ToList();
+                }
+
+                return factura;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         private static string ValidarFacturaRequest(FacturaRequest factura)
         {
             var errores = new List<string>();

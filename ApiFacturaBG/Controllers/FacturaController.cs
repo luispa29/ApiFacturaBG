@@ -7,7 +7,7 @@ using Models.Response;
 
 namespace ApiFacturaBG.Controllers
 {
-    [JwtAuthorization]
+   // [JwtAuthorization]
     [Route("api/[controller]")]
     [ApiController]
     public class FacturaController(IFacturaService _facturaSrvc) : ControllerBase
@@ -29,6 +29,26 @@ namespace ApiFacturaBG.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, RespuestaApi<object>.Error($"Error al crear factura: {ex.Message}"));
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                var factura = await _facturaSrvc.ObtenerPorID(id);
+
+                if (factura == null)
+                {
+                    return NotFound(RespuestaApi<object>.Error($"La factura con ID {id} no existe"));
+                }
+
+                return Ok(RespuestaApi<FacturaResponse>.Exitosa(factura, "Factura obtenida exitosamente"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, RespuestaApi<object>.Error($"Error al obtener factura: {ex.Message}"));
             }
         }
     }

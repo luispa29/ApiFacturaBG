@@ -99,3 +99,58 @@ BEGIN
     END CATCH
 END
 GO
+
+CREATE OR ALTER PROCEDURE SP_Factura_ObtenerPorID
+    @FacturaID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- 1. Encabezado de la factura
+    SELECT 
+        f.FacturaID,
+        f.NumeroFactura,
+        f.ClienteID,
+        c.Nombre AS ClienteNombre,
+        c.Identificacion AS ClienteIdentificacion,
+        f.VendedorID,
+        u.Nombre AS VendedorNombre,
+        f.FechaFactura,
+        f.Subtotal,
+        f.IVA,
+        f.Total,
+        f.Activo,
+        f.FechaCreacion
+    FROM dbo.Facturas f
+    INNER JOIN dbo.Clientes c ON f.ClienteID = c.ClienteID
+    INNER JOIN dbo.Usuarios u ON f.VendedorID = u.UsuarioID
+    WHERE f.FacturaID = @FacturaID;
+
+    -- 2. Detalles de la factura
+    SELECT 
+        fd.DetalleID,
+        fd.FacturaID,
+        fd.ProductoID,
+        p.Nombre AS ProductoNombre,
+        fd.Cantidad,
+        fd.PrecioUnitario,
+        fd.Subtotal,
+        fd.IVA,
+        fd.Total
+    FROM dbo.FacturaDetalles fd
+    INNER JOIN dbo.Productos p ON fd.ProductoID = p.ProductoID
+    WHERE fd.FacturaID = @FacturaID;
+
+    -- 3. Pagos de la factura
+    SELECT 
+        fp.PagoID,
+        fp.FacturaID,
+        fp.FormaPagoID,
+        fmp.Nombre AS FormaPagoNombre,
+        fp.Monto,
+        fp.Referencia
+    FROM dbo.FacturaPagos fp
+    INNER JOIN dbo.FormasPago fmp ON fp.FormaPagoID = fmp.FormaPagoID
+    WHERE fp.FacturaID = @FacturaID;
+END
+GO
