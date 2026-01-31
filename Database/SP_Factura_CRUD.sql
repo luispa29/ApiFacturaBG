@@ -190,7 +190,7 @@ BEGIN
       AND (@FechaHasta IS NULL OR f.FechaFactura <= @FechaHasta)
       AND (@MontoDesde IS NULL OR f.Total >= @MontoDesde)
       AND (@MontoHasta IS NULL OR f.Total <= @MontoHasta)
-    ORDER BY f.FechaFactura DESC, f.FacturaID DESC
+    ORDER BY f.FacturaID DESC
     OFFSET @Offset ROWS FETCH NEXT @TamanoPagina ROWS ONLY;
 
     SELECT COUNT(*) AS Total

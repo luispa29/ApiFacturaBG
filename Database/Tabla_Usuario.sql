@@ -1,6 +1,6 @@
 
 
-CREATE TABLE Usuario (
+CREATE TABLE Usuarios (
     UsuarioID INT IDENTITY(1,1) PRIMARY KEY,
     Username NVARCHAR(50) NOT NULL UNIQUE,
     HashContrasena VARBINARY(MAX) NOT NULL,
