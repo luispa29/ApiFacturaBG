@@ -45,7 +45,13 @@ CREATE OR ALTER PROCEDURE SP_Cliente_ExistePorID
 AS
 BEGIN
     
-    SELECT ClienteID
+    SELECT ClienteID,
+        Identificacion,
+        Nombre,
+        Telefono,
+        Email,
+        FechaRegistro,
+        Activo
     FROM dbo.Clientes 
     WHERE ClienteID = @ClienteID;
 END

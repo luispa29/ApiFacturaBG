@@ -55,7 +55,13 @@ AS
 BEGIN
     SET NOCOUNT ON;
     
-    SELECT UsuarioID
+    SELECT 
+     UsuarioID,
+        Username,
+        Nombre,
+        Email,
+        Activo,
+        FechaCreacion
     FROM dbo.Usuarios 
     WHERE UsuarioID = @UsuarioID;
 END

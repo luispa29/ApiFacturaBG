@@ -1,4 +1,4 @@
-using Application.Ports.Driving;
+锘縰sing Application.Ports.Driving;
 
 using Domain.Services;
 using Domain.UseCases;
@@ -7,7 +7,7 @@ using Models.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configuraci髇 de AppSettings
+// 1. Configuraci贸n de AppSettings
 ConfigurationManager configuration = builder.Configuration;
 builder.Services.Configure<AppSettings>(configuration.GetSection(nameof(AppSettings)));
 AppSettings appSettings = new();
@@ -22,24 +22,27 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMapSql(builder.Configuration);
 
 
-// Configuraci髇 de SecuritySettings
+// Configuraci贸n de SecuritySettings
 builder.Services.Configure<SecuritySettings>(configuration.GetSection("Security"));
 SecuritySettings securitySettings = new();
 configuration.GetSection("Security").Bind(securitySettings);
 
 
-//Configuraci髇 de servicios
+//Configuraci贸n de servicios
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-// Inyecci髇 de dependencias - Servicios de Seguridad
+// Inyecci贸n de dependencias - Servicios de Seguridad
 builder.Services.AddSingleton<IAesEncryptionService, AesEncryptionService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 
-// Inyecci髇 de dependencias - Use Cases
+// Inyecci贸n de dependencias - Use Cases
 builder.Services.AddScoped<IUsuarioService, UsuarioUseCase>();
 builder.Services.AddScoped<ILoginService, LoginUseCase>();
 builder.Services.AddScoped<IProductoService, ProductoUseCase>();
 builder.Services.AddScoped<IClienteService, ClienteUseCase>();
+builder.Services.AddScoped<IFacturaService, FacturaUseCase>();
+builder.Services.AddScoped<IFormaPagoService, FormaPagoUseCase>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -66,3 +69,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
