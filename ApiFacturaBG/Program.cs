@@ -37,6 +37,7 @@ builder.Services.AddSingleton<IJwtService, JwtService>();
 
 // Inyección de dependencias - Use Cases
 builder.Services.AddScoped<IUsuarioService, UsuarioUseCase>();
+builder.Services.AddScoped<ILoginService, LoginUseCase>();
 
 builder.Services.AddCors(options =>
 {

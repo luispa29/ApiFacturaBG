@@ -61,24 +61,4 @@ BEGIN
 END
 GO
 
--- =============================================
--- SP: Validar si existe un usuario y retornar su ID
--- =============================================
-CREATE OR ALTER PROCEDURE SP_Usuario_ValidarExistencia
-    @Username NVARCHAR(50) = NULL,
-    @Email NVARCHAR(100) = NULL
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    SELECT 
-        UsuarioID,
-        Username,
-        Email,
-        Nombre,
-        Activo
-    FROM dbo.Usuarios
-    WHERE (@Username IS NOT NULL AND Username = @Username)
-       OR (@Email IS NOT NULL AND Email = @Email);
-END
-GO
+
