@@ -55,3 +55,44 @@ BEGIN
     SELECT @@ROWCOUNT AS FilasAfectadas;
 END
 GO
+
+CREATE OR ALTER PROCEDURE SP_Cliente_Listar
+    @NumeroPagina INT = 1,
+    @TamanoPagina INT = 10,
+    @Filtro NVARCHAR(200) = NULL,
+    @SoloActivos BIT = NULL
+AS
+BEGIN
+    
+    DECLARE @Offset INT = (@NumeroPagina - 1) * @TamanoPagina;
+    
+    SELECT 
+        ClienteID,
+        Identificacion,
+        Nombre,
+        Telefono,
+        Email,
+        FechaRegistro,
+        Activo
+    FROM dbo.Clientes
+    WHERE 
+        (@Filtro IS NULL OR 
+         Nombre LIKE '%' + @Filtro + '%' OR
+         Identificacion LIKE '%' + @Filtro + '%' OR
+         Email LIKE '%' + @Filtro + '%')
+        AND (@SoloActivos IS NULL OR Activo = @SoloActivos)
+    ORDER BY ClienteID DESC
+    OFFSET @Offset ROWS
+    FETCH NEXT @TamanoPagina ROWS ONLY;
+
+   
+    SELECT COUNT(*) as Total
+    FROM dbo.Clientes
+    WHERE 
+        (@Filtro IS NULL OR 
+         Nombre LIKE '%' + @Filtro + '%' OR
+         Identificacion LIKE '%' + @Filtro + '%' OR
+         Email LIKE '%' + @Filtro + '%')
+        AND (@SoloActivos IS NULL OR Activo = @SoloActivos);
+END
+GO

@@ -67,5 +67,33 @@ namespace ApiFacturaBG.Controllers
                 return StatusCode(500, RespuestaApi<object>.Error($"Error al eliminar cliente: {ex.Message}"));
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
+           [FromQuery] string? filtro = null,
+           [FromQuery] int numeroPagina = 1,
+           [FromQuery] int tamanoPagina = 10,
+           [FromQuery] bool soloActivos = true
+            )
+        {
+            try
+            {
+                var (clientes, total) = await _clienteSrvc.Obtener(numeroPagina, tamanoPagina, filtro, soloActivos);
+
+                var pagination = new
+                {
+                    Page = numeroPagina,
+                    PageSize = tamanoPagina,
+                    TotalRecords = total,
+                    TotalPages = (int)Math.Ceiling(total / (double)tamanoPagina)
+                };
+
+                return Ok(RespuestaApi<object>.ExitosaConPaginacion(clientes, total, numeroPagina, tamanoPagina, "clientes obtenidos exitosamente"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, RespuestaApi<object>.Error($"Error al obtener clientes: {ex.Message}"));
+            }
+        }
     }
 }

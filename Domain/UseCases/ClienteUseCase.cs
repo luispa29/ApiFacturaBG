@@ -113,6 +113,34 @@ namespace Domain.UseCases
             }
         }
 
+        public async Task<(List<ClienteResponse> clientes, int totalRegistros)> Obtener(int numeroPagina, int tamanoPagina, string filtro, bool soloActivos)
+        {
+            try
+            {
+                var resultTypes = new Type[] { typeof(ClienteResponse), typeof(TotalRegistros) };
+
+                var results = await _sqlPort.ExecuteStoredProcedureMultipleAsync(
+                    "SP_Cliente_Listar",
+                    resultTypes,
+                     new
+                     {
+                         NumeroPagina = numeroPagina,
+                         TamanoPagina = tamanoPagina,
+                         Filtro = filtro,
+                         SoloActivos = soloActivos
+                     });
+                var clientes = results[0].Cast<ClienteResponse>().ToList();
+                var totalRegistros = (results[1].FirstOrDefault() as TotalRegistros)?.Total ?? 0;
+                return (clientes, totalRegistros);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public static string ValidarClienteRequest(ClienteRequest clienteRequest, bool editar = false)
         {
             var errores = new List<string>();
