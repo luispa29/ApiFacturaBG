@@ -99,6 +99,35 @@ namespace Domain.UseCases
             }
         }
 
+        public async Task<(IEnumerable<FacturaResponse> facturas, int total)> ListarFacturas(FacturaFiltroRequest filtros)
+        {
+            try
+            {
+                var parametros = new
+                {
+                    filtros.NumeroFactura,
+                    filtros.ClienteID,
+                    filtros.VendedorID,
+                    filtros.FechaDesde,
+                    filtros.FechaHasta,
+                    NumeroPagina = filtros.Pagina,
+                    TamanoPagina = filtros.RegistrosPorPagina
+                };
+
+                var resultTypes = new[] { typeof(FacturaResponse), typeof(TotalRegistros) };
+                var results = await _sqlPort.ExecuteStoredProcedureMultipleAsync("SP_Factura_Listar", resultTypes, parametros);
+
+                var facturas = results[0].Cast<FacturaResponse>();
+                var total = results[1].Cast<TotalRegistros>().FirstOrDefault()?.Total ?? 0;
+
+                return (facturas, total);
+            }
+            catch (Exception)
+            {
+                return (Enumerable.Empty<FacturaResponse>(), 0);
+            }
+        }
+
         private static string ValidarFacturaRequest(FacturaRequest factura)
         {
             var errores = new List<string>();

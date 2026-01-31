@@ -104,8 +104,6 @@ CREATE OR ALTER PROCEDURE SP_Factura_ObtenerPorID
     @FacturaID INT
 AS
 BEGIN
-    SET NOCOUNT ON;
-
     -- 1. Encabezado de la factura
     SELECT 
         f.FacturaID,
@@ -152,5 +150,51 @@ BEGIN
     FROM dbo.FacturaPagos fp
     INNER JOIN dbo.FormasPago fmp ON fp.FormaPagoID = fmp.FormaPagoID
     WHERE fp.FacturaID = @FacturaID;
+END
+GO
+
+CREATE OR ALTER PROCEDURE SP_Factura_Listar
+    @NumeroFactura NVARCHAR(50) = NULL,
+    @ClienteID INT = NULL,
+    @VendedorID INT = NULL,
+    @FechaDesde DATETIME = NULL,
+    @FechaHasta DATETIME = NULL,
+    @NumeroPagina INT = 1,
+    @TamanoPagina INT = 10
+AS
+BEGIN
+    DECLARE @Offset INT = (@NumeroPagina - 1) * @TamanoPagina;
+
+    SELECT 
+        f.FacturaID,
+        f.NumeroFactura,
+        f.ClienteID,
+        c.Nombre AS ClienteNombre,
+        f.VendedorID,
+        u.Nombre AS VendedorNombre,
+        f.FechaFactura,
+        f.Subtotal,
+        f.IVA,
+        f.Total,
+        f.Activo,
+        f.FechaCreacion
+    FROM dbo.Facturas f
+    INNER JOIN dbo.Clientes c ON f.ClienteID = c.ClienteID
+    INNER JOIN dbo.Usuarios u ON f.VendedorID = u.UsuarioID
+    WHERE (@NumeroFactura IS NULL OR f.NumeroFactura LIKE '%' + @NumeroFactura + '%')
+      AND (@ClienteID IS NULL OR f.ClienteID = @ClienteID)
+      AND (@VendedorID IS NULL OR f.VendedorID = @VendedorID)
+      AND (@FechaDesde IS NULL OR f.FechaFactura >= @FechaDesde)
+      AND (@FechaHasta IS NULL OR f.FechaFactura <= @FechaHasta)
+    ORDER BY f.FechaFactura DESC, f.FacturaID DESC
+    OFFSET @Offset ROWS FETCH NEXT @TamanoPagina ROWS ONLY;
+
+    SELECT COUNT(*) AS Total
+    FROM dbo.Facturas f
+    WHERE (@NumeroFactura IS NULL OR f.NumeroFactura LIKE '%' + @NumeroFactura + '%')
+      AND (@ClienteID IS NULL OR f.ClienteID = @ClienteID)
+      AND (@VendedorID IS NULL OR f.VendedorID = @VendedorID)
+      AND (@FechaDesde IS NULL OR f.FechaFactura >= @FechaDesde)
+      AND (@FechaHasta IS NULL OR f.FechaFactura <= @FechaHasta);
 END
 GO

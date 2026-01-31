@@ -12,6 +12,25 @@ namespace ApiFacturaBG.Controllers
     [ApiController]
     public class FacturaController(IFacturaService _facturaSrvc) : ControllerBase
     {
+        [HttpGet]
+        public async Task<IActionResult> List([FromQuery] FacturaFiltroRequest filtros)
+        {
+            try
+            {
+                var (facturas, total) = await _facturaSrvc.ListarFacturas(filtros);
+
+                return Ok(RespuestaApi<IEnumerable<FacturaResponse>>.ExitosaConPaginacion(
+                    facturas, 
+                    total,
+                    filtros.Pagina, 
+                    filtros.RegistrosPorPagina, 
+                    "Facturas listadas exitosamente"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, RespuestaApi<object>.Error($"Error al listar facturas: {ex.Message}"));
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] FacturaRequest factura)

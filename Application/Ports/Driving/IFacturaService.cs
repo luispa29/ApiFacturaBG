@@ -7,5 +7,6 @@ namespace Application.Ports.Driving
     {
         Task<(int id, string mensaje)> CrearFactura(FacturaRequest facturaRequest);
         Task<FacturaResponse?> ObtenerPorID(int facturaID);
+        Task<(IEnumerable<FacturaResponse> facturas, int total)> ListarFacturas(FacturaFiltroRequest filtros);
     }
 }

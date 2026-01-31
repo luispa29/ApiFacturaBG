@@ -1,8 +1,6 @@
 CREATE OR ALTER PROCEDURE SP_FormaPago_ListarActivos
 AS
 BEGIN
-    SET NOCOUNT ON;
-    
     SELECT 
         FormaPagoID,
         Nombre,
