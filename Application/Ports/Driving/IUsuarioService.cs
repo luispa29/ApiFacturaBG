@@ -12,5 +12,6 @@ namespace Application.Ports.Driving
     {
         Task <(int id, string mensaje)> CrearUsuario(UsuarioRequest usuarioRequest);
         Task <(int id, string mensaje)> EditarUsuario(UsuarioUpdateRequest usuarioRequest);
+        Task <(int id, string mensaje)> EliminarUsuario(int usuarioID);
     }
 }

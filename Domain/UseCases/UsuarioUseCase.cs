@@ -1,5 +1,6 @@
 ﻿using Application.Ports.Driven;
 using Application.Ports.Driving;
+using Microsoft.AspNetCore.Components.Forms;
 using Models.Request;
 
 namespace Domain.UseCases
@@ -55,7 +56,7 @@ namespace Domain.UseCases
                     Nombre = usuario.Nombre,
                     Email = usuario.Email
                 };
-                string validarionErrores = ValidarUsuarioRequest(usuarioRequest,true, usuario.ActualizarContrasena);
+                string validarionErrores = ValidarUsuarioRequest(usuarioRequest, true, usuario.ActualizarContrasena);
 
                 if (validarionErrores.Length > 0)
                 {
@@ -66,7 +67,7 @@ namespace Domain.UseCases
                 var existeCorreo = await ValidarCorreoExistente(usuario.Username, usuario.Id);
                 var existeId = await ValidarIdExistente(usuario.Id);
 
-                if (existeNombre.Length > 0 || existeCorreo.Length > 0  || existeId.Length > 0)
+                if (existeNombre.Length > 0 || existeCorreo.Length > 0 || existeId.Length > 0)
                 {
                     return (0, string.Join(", ", new[] { existeNombre, existeCorreo, existeId }.Where(e => e.Length > 0)));
                 }
@@ -107,7 +108,7 @@ namespace Domain.UseCases
             {
                 errores.Add("El campo NombreUsuario es requerido");
             }
-            if (string.IsNullOrWhiteSpace(usuarioRequest.Contrasena) && actualizarConstrasena )
+            if (string.IsNullOrWhiteSpace(usuarioRequest.Contrasena) && actualizarConstrasena)
             {
                 errores.Add("El campo Contrasena es requerido");
             }
@@ -144,6 +145,34 @@ namespace Domain.UseCases
 
             var existe = await _sqlPort.ExecuteStoredProcedureBoolAsync("SP_Usuario_ExistePorID", parameter);
             return !existe ? "El id del usuario es incorrecto" : string.Empty;
+        }
+
+        public async Task<(int id, string mensaje)> EliminarUsuario(int usuarioID)
+        {
+            try
+            {
+                var existeId = await ValidarIdExistente(usuarioID);
+
+                if (existeId.Length > 0)
+                {
+                    return (0, existeId);
+                }
+
+                var eliminar = await _sqlPort.ExecuteNonQueryAsync("SP_Usuario_Eliminar", new { UsuarioID = usuarioID, EliminacionFisica = false });
+                if (eliminar > 0)
+                {
+                    return (eliminar, "Usuario eliminado exitosamente.");
+                }
+                else
+                {
+                    return (0, "No se pudo eliminado el usuario.");
+                }
+            }
+            catch (Exception)
+            {
+
+                return (0, "Ocurrió un error inesperado al procesar la solicitud.");
+            }
         }
     }
 

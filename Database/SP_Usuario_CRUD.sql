@@ -153,7 +153,6 @@ CREATE OR ALTER PROCEDURE SP_Usuario_Eliminar
     @EliminacionFisica BIT = 0
 AS
 BEGIN
-    SET NOCOUNT ON;
     
     IF @EliminacionFisica = 1
     BEGIN
