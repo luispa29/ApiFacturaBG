@@ -80,13 +80,19 @@ GO
 
 CREATE OR ALTER PROCEDURE SP_Producto_Eliminar
     @ProductoID INT,
-    @EliminacionFisica BIT = 1
+    @EliminacionFisica BIT = 0
 AS
 BEGIN
     
     IF @EliminacionFisica = 1
     BEGIN
         DELETE FROM dbo.Productos WHERE ProductoID = @ProductoID;
+    END
+    ELSE
+    BEGIN
+        UPDATE dbo.Productos
+        SET Activo = 0
+        WHERE ProductoID = @ProductoID;
     END
     
     SELECT @@ROWCOUNT AS FilasAfectadas;

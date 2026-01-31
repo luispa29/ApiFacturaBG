@@ -83,6 +83,34 @@ namespace Domain.UseCases
 
         }
 
+        public async Task<(int id, string mensaje)> EliminarProducto(int productoID)
+        {
+            try
+            {
+                var existeId = await ValidarIdExistente(productoID);
+
+                if (existeId.Length > 0)
+                {
+                    return (0, existeId);
+                }
+
+                var eliminar = await _sqlPort.ExecuteNonQueryAsync("SP_Producto_Eliminar", new { ProductoID = productoID, EliminacionFisica = false });
+                if (eliminar > 0)
+                {
+                    return (eliminar, "Producto eliminado exitosamente.");
+                }
+                else
+                {
+                    return (0, "No se pudo eliminar el producto.");
+                }
+            }
+            catch (Exception)
+            {
+
+                return (0, "Ocurrió un error inesperado al procesar la solicitud.");
+            }
+        }
+
         public static string ValidarProductoRequest(ProductoRequest productoRequest, bool editar = false)
         {
             var errores = new List<string>();

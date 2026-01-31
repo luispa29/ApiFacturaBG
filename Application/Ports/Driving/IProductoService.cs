@@ -7,5 +7,6 @@ namespace Application.Ports.Driving
     {
         Task<(int id, string mensaje)> CrearProducto(ProductoRequest productoRequest);
         Task<(int id, string mensaje)> EditarProducto(ProductoRequest productoRequest);
+        Task<(int id, string mensaje)> EliminarProducto(int productoID);
     }
 }
