@@ -45,6 +45,44 @@ namespace Domain.UseCases
 
         }
 
+        public async Task<(int id, string mensaje)> EditarProducto(ProductoRequest producto)
+        {
+            try
+            {
+                string validarionErrores = ValidarProductoRequest(producto, true);
+
+                if (validarionErrores.Length > 0)
+                {
+                    return (0, validarionErrores);
+                }
+
+                var existeNombre = await ValidarProductoExistente(producto.Nombre, producto.Id);
+                var existeId = await ValidarIdExistente(producto.Id);
+
+                if (existeNombre.Length > 0 || existeId.Length > 0)
+                {
+                    return (0, string.Join(", ", new[] { existeNombre, existeId }.Where(e => e.Length > 0)));
+                }
+
+                var editar = await _sqlPort.ExecuteNonQueryAsync("SP_Producto_Actualizar", producto);
+
+                if (editar > 0)
+                {
+                    return (editar, "Producto actualizado exitosamente.");
+                }
+                else
+                {
+                    return (0, "No se pudo actualizar el producto.");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return (0, "Ocurrió un error inesperado al procesar la solicitud.");
+            }
+
+        }
+
         public static string ValidarProductoRequest(ProductoRequest productoRequest, bool editar = false)
         {
             var errores = new List<string>();

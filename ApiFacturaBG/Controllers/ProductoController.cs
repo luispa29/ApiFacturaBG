@@ -31,5 +31,24 @@ namespace ApiFacturaBG.Controllers
                 return StatusCode(500, RespuestaApi<object>.Error($"Error al crear producto: {ex.Message}"));
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> Edit([FromBody] ProductoRequest producto)
+        {
+            try
+            {
+                var (id, mensaje) = await _productoSrvc.EditarProducto(producto);
+
+                if (id == 0)
+                {
+                    return BadRequest(RespuestaApi<object>.Error(mensaje));
+                }
+                return Ok(RespuestaApi<object>.Exitosa(new { Id = id }, mensaje));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, RespuestaApi<object>.Error($"Error al editar producto: {ex.Message}"));
+            }
+        }
     }
 }
