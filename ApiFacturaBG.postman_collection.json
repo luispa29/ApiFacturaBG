@@ -1,0 +1,400 @@
+{
+	"info": {
+		"_postman_id": "8a3d4f5b-6c7d-4e8f-9a0b-1c2d3e4f5g6h",
+		"name": "ApiFacturaBG",
+		"description": "Colección completa de endpoints para el sistema de facturación, incluyendo maestros, login y gestión de facturas.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"console.log('Respuesta completa:', JSON.stringify(jsonData));",
+									"if (jsonData.datos && jsonData.datos.Token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.datos.Token);",
+									"    console.log('Token guardado:', jsonData.datos.Token);",
+									"} else {",
+									"    console.log('No se encontró el token en la respuesta');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/login?userName=admin&contrasena=Admin123*",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"login"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "admin"
+								},
+								{
+									"key": "contrasena",
+									"value": "Admin123*"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Maestros",
+			"item": [
+				{
+					"name": "Usuarios",
+					"item": [
+						{
+							"name": "Listar Usuarios",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/usuario?numeroPagina=1&tamanoPagina=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"usuario"
+									],
+									"query": [
+										{
+											"key": "numeroPagina",
+											"value": "1"
+										},
+										{
+											"key": "tamanoPagina",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Crear Usuario",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"{{$randomUserName}}\",\n    \"contrasena\": \"Pass123*\",\n    \"nombre\": \"{{$randomFullName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"activo\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/usuario",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"usuario"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Clientes",
+					"item": [
+						{
+							"name": "Listar Clientes",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/cliente?numeroPagina=1&tamanoPagina=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"cliente"
+									],
+									"query": [
+										{
+											"key": "numeroPagina",
+											"value": "1"
+										},
+										{
+											"key": "tamanoPagina",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Crear Cliente",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"identificacion\": \"{{$randomInt}}\",\n    \"nombre\": \"{{$randomFullName}}\",\n    \"telefono\": \"{{$randomPhoneNumber}}\",\n    \"email\": \"{{$randomEmail}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/cliente",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"cliente"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Productos",
+					"item": [
+						{
+							"name": "Listar Productos",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/producto?numeroPagina=1&tamanoPagina=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"producto"
+									],
+									"query": [
+										{
+											"key": "numeroPagina",
+											"value": "1"
+										},
+										{
+											"key": "tamanoPagina",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Crear Producto",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"nombre\": \"{{$randomProductName}}\",\n    \"precioUnitario\": {{$randomPrice}},\n    \"stockActual\": {{$randomInt}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/producto",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"producto"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Facturas",
+			"item": [
+				{
+					"name": "Listar Facturas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/factura?pagina=1&registrosPorPagina=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"factura"
+							],
+							"query": [
+								{
+									"key": "pagina",
+									"value": "1"
+								},
+								{
+									"key": "registrosPorPagina",
+									"value": "10"
+								},
+								{
+									"key": "numeroFactura",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "clienteID",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Factura por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/factura/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"factura",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Factura",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteID\": 1,\n    \"vendedorID\": 1,\n    \"fechaFactura\": \"{{$isoTimestamp}}\",\n    \"detalles\": [\n        {\n            \"productoID\": 1,\n            \"cantidad\": 2,\n            \"precioUnitario\": 1500.00\n        }\n    ],\n    \"pagos\": [\n        {\n            \"formaPagoID\": 1,\n            \"monto\": 3000.00,\n            \"referencia\": \"Efectivo\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/factura",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"factura"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Medios de Pago",
+			"item": [
+				{
+					"name": "Listar Activos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/formapago",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"formapago"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:7157",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

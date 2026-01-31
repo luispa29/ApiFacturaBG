@@ -15,6 +15,7 @@ namespace Domain.Services
     {
         private readonly SecuritySettings _securitySettings;
         private readonly IAesEncryptionService _aesEncryptionService;
+        private const string KeyId = "FacturaBG-Default-Key";
 
         public JwtService(IOptions<SecuritySettings> securitySettings, IAesEncryptionService aesEncryptionService)
         {
@@ -27,7 +28,10 @@ namespace Domain.Services
             var encryptedUserId = _aesEncryptionService.Encrypt(userId.ToString(CultureInfo.InvariantCulture));
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_securitySettings.JwtSecret);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securitySettings.JwtSecret))
+            {
+                KeyId = KeyId
+            };
 
             var now = DateTime.UtcNow;
 
@@ -43,9 +47,7 @@ namespace Domain.Services
                 Expires = now.AddHours(_securitySettings.JwtExpirationHours),
                 Issuer = _securitySettings.JwtIssuer,
                 Audience = _securitySettings.JwtAudience,
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -58,14 +60,17 @@ namespace Domain.Services
                 return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_securitySettings.JwtSecret);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securitySettings.JwtSecret))
+            {
+                KeyId = KeyId
+            };
 
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = key,
                     ValidateIssuer = true,
                     ValidIssuer = _securitySettings.JwtIssuer,
                     ValidateAudience = true,
@@ -80,14 +85,15 @@ namespace Domain.Services
                 if (subClaim == null) return null;
 
                 var encryptedUserId = subClaim.Value;
-
-               var userIdString = _aesEncryptionService.Decrypt(encryptedUserId);
-                return int.Parse(userIdString);
+                var userIdString = _aesEncryptionService.Decrypt(encryptedUserId);
+                
+                return int.TryParse(userIdString, out int userId) ? userId : null;
             }
             catch (Exception ex)
             {
+                // Registramos el error internamente si es necesario
                 System.Diagnostics.Debug.WriteLine($"Error validando token: {ex.Message}");
-                return null;
+                throw; // Re-lanzamos para que el filtro capture el mensaje exacto
             }
         }
     }
