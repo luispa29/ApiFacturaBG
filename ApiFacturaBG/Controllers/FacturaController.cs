@@ -7,7 +7,7 @@ using Models.Response;
 
 namespace ApiFacturaBG.Controllers
 {
-   // [JwtAuthorization]
+    [JwtAuthorization]
     [Route("api/[controller]")]
     [ApiController]
     public class FacturaController(IFacturaService _facturaSrvc) : ControllerBase
