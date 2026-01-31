@@ -7,6 +7,8 @@ namespace Models.Request
         public int? VendedorID { get; set; }
         public DateTime? FechaDesde { get; set; }
         public DateTime? FechaHasta { get; set; }
+        public decimal? MontoDesde { get; set; }
+        public decimal? MontoHasta { get; set; }
         public int Pagina { get; set; } = 1;
         public int RegistrosPorPagina { get; set; } = 10;
     }

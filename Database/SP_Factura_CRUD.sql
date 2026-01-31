@@ -159,6 +159,8 @@ CREATE OR ALTER PROCEDURE SP_Factura_Listar
     @VendedorID INT = NULL,
     @FechaDesde DATETIME = NULL,
     @FechaHasta DATETIME = NULL,
+    @MontoDesde DECIMAL(18, 2) = NULL,
+    @MontoHasta DECIMAL(18, 2) = NULL,
     @NumeroPagina INT = 1,
     @TamanoPagina INT = 10
 AS
@@ -186,6 +188,8 @@ BEGIN
       AND (@VendedorID IS NULL OR f.VendedorID = @VendedorID)
       AND (@FechaDesde IS NULL OR f.FechaFactura >= @FechaDesde)
       AND (@FechaHasta IS NULL OR f.FechaFactura <= @FechaHasta)
+      AND (@MontoDesde IS NULL OR f.Total >= @MontoDesde)
+      AND (@MontoHasta IS NULL OR f.Total <= @MontoHasta)
     ORDER BY f.FechaFactura DESC, f.FacturaID DESC
     OFFSET @Offset ROWS FETCH NEXT @TamanoPagina ROWS ONLY;
 
@@ -195,6 +199,8 @@ BEGIN
       AND (@ClienteID IS NULL OR f.ClienteID = @ClienteID)
       AND (@VendedorID IS NULL OR f.VendedorID = @VendedorID)
       AND (@FechaDesde IS NULL OR f.FechaFactura >= @FechaDesde)
-      AND (@FechaHasta IS NULL OR f.FechaFactura <= @FechaHasta);
+      AND (@FechaHasta IS NULL OR f.FechaFactura <= @FechaHasta)
+      AND (@MontoDesde IS NULL OR f.Total >= @MontoDesde)
+      AND (@MontoHasta IS NULL OR f.Total <= @MontoHasta);
 END
 GO

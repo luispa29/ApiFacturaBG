@@ -110,6 +110,8 @@ namespace Domain.UseCases
                     filtros.VendedorID,
                     filtros.FechaDesde,
                     filtros.FechaHasta,
+                    filtros.MontoDesde,
+                    filtros.MontoHasta,
                     NumeroPagina = filtros.Pagina,
                     TamanoPagina = filtros.RegistrosPorPagina
                 };
