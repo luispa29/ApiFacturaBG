@@ -46,6 +46,45 @@ namespace Domain.UseCases
 
         }
 
+        public async Task<(int id, string mensaje)> EditarCliente(ClienteRequest cliente)
+        {
+            try
+            {
+                string validarionErrores = ValidarClienteRequest(cliente, true);
+
+                if (validarionErrores.Length > 0)
+                {
+                    return (0, validarionErrores);
+                }
+
+                var existeIdentificacion = await ValidarClienteExistentePorIdentificacion(cliente.Identificacion, cliente.Id);
+                var existeEmail = await ValidarClienteExistentePorEmail(cliente.Email, cliente.Id);
+                var existeId = await ValidarIdExistente(cliente.Id);
+
+                if (existeIdentificacion.Length > 0 || existeEmail.Length > 0 || existeId.Length > 0)
+                {
+                    return (0, string.Join(", ", new[] { existeIdentificacion, existeEmail, existeId }.Where(e => e.Length > 0)));
+                }
+
+                var editar = await _sqlPort.ExecuteNonQueryAsync("SP_Cliente_Actualizar", cliente);
+
+                if (editar > 0)
+                {
+                    return (editar, "Cliente actualizado exitosamente.");
+                }
+                else
+                {
+                    return (0, "No se pudo actualizar el cliente.");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return (0, "Ocurrió un error inesperado al procesar la solicitud.");
+            }
+
+        }
+
         public static string ValidarClienteRequest(ClienteRequest clienteRequest, bool editar = false)
         {
             var errores = new List<string>();

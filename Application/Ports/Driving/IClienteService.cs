@@ -6,5 +6,6 @@ namespace Application.Ports.Driving
     public interface IClienteService
     {
         Task<(int id, string mensaje)> CrearCliente(ClienteRequest clienteRequest);
+        Task<(int id, string mensaje)> EditarCliente(ClienteRequest clienteRequest);
     }
 }
