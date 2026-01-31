@@ -11,5 +11,6 @@ namespace Application.Ports.Driving
     public interface IUsuarioService
     {
         Task <(int id, string mensaje)> CrearUsuario(UsuarioRequest usuarioRequest);
+        Task <(int id, string mensaje)> EditarUsuario(UsuarioUpdateRequest usuarioRequest);
     }
 }

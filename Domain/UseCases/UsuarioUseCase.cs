@@ -6,28 +6,28 @@ namespace Domain.UseCases
 {
     public class UsuarioUseCase(ISqlPort _sqlPort) : IUsuarioService
     {
-        public async Task<(int id, string mensaje)> CrearUsuario(UsuarioRequest usuarioRequest)
+        public async Task<(int id, string mensaje)> CrearUsuario(UsuarioRequest usuario)
         {
             try
             {
-                string validarionErrores = ValidarUsuarioRequest(usuarioRequest);
+                string validarionErrores = ValidarUsuarioRequest(usuario);
 
                 if (validarionErrores.Length > 0)
                 {
                     return (0, validarionErrores);
                 }
 
-                var existeNombre = await ValidarUsuarioExistente(usuarioRequest.Username);
-                var existeCorreo = await ValidarCorreoExistente(usuarioRequest.Username);
+                var existeNombre = await ValidarUsuarioExistente(usuario.Username);
+                var existeCorreo = await ValidarCorreoExistente(usuario.Username);
 
                 if (existeNombre.Length > 0 || existeCorreo.Length > 0)
                 {
                     return (0, string.Join(", ", new[] { existeNombre, existeCorreo }.Where(e => e.Length > 0)));
                 }
 
-                var registrarUsuario= await _sqlPort.ExecuteNonQueryAsync("SP_Usuario_Crear", usuarioRequest);
+                var registrarUsuario = await _sqlPort.ExecuteNonQueryAsync("SP_Usuario_Crear", usuario);
 
-                if(registrarUsuario > 0)
+                if (registrarUsuario > 0)
                 {
                     return (registrarUsuario, "Usuario creado exitosamente.");
                 }
@@ -43,11 +43,62 @@ namespace Domain.UseCases
             }
 
         }
+        public async Task<(int id, string mensaje)> EditarUsuario(UsuarioUpdateRequest usuario)
+        {
+            try
+            {
+                var usuarioRequest = new UsuarioRequest
+                {
+                    Id = usuario.Id,
+                    Username = usuario.Username,
+                    Contrasena = usuario.ActualizarContrasena ? usuario.NuevaContrasena : string.Empty,
+                    Nombre = usuario.Nombre,
+                    Email = usuario.Email
+                };
+                string validarionErrores = ValidarUsuarioRequest(usuarioRequest,true, usuario.ActualizarContrasena);
+
+                if (validarionErrores.Length > 0)
+                {
+                    return (0, validarionErrores);
+                }
+
+                var existeNombre = await ValidarUsuarioExistente(usuario.Username, usuario.Id);
+                var existeCorreo = await ValidarCorreoExistente(usuario.Username, usuario.Id);
+                var existeId = await ValidarIdExistente(usuario.Id);
+
+                if (existeNombre.Length > 0 || existeCorreo.Length > 0  || existeId.Length > 0)
+                {
+                    return (0, string.Join(", ", new[] { existeNombre, existeCorreo, existeId }.Where(e => e.Length > 0)));
+                }
 
 
-        public string ValidarUsuarioRequest(UsuarioRequest usuarioRequest)
+                var editar = await _sqlPort.ExecuteNonQueryAsync("SP_Usuario_Actualizar", usuario);
+
+                if (editar > 0)
+                {
+                    return (editar, "Usuario aactualizado exitosamente.");
+                }
+                else
+                {
+                    return (0, "No se pudo actualizar el usuario.");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return (0, "Ocurrió un error inesperado al procesar la solicitud.");
+            }
+
+        }
+
+
+        public static string ValidarUsuarioRequest(UsuarioRequest usuarioRequest, bool editar = false, bool actualizarConstrasena = true)
         {
             var errores = new List<string>();
+            if (editar && usuarioRequest.Id <= 0)
+            {
+                errores.Add("El campo Id es requerido para la edición");
+            }
             if (usuarioRequest == null)
             {
                 return "El objeto UsuarioRequest no puede ser nulo";
@@ -56,7 +107,7 @@ namespace Domain.UseCases
             {
                 errores.Add("El campo NombreUsuario es requerido");
             }
-            if (string.IsNullOrWhiteSpace(usuarioRequest.Contrasena))
+            if (string.IsNullOrWhiteSpace(usuarioRequest.Contrasena) && actualizarConstrasena )
             {
                 errores.Add("El campo Contrasena es requerido");
             }
@@ -86,6 +137,13 @@ namespace Domain.UseCases
 
             var existe = await _sqlPort.ExecuteStoredProcedureBoolAsync("SP_Usuario_ExistePorEmail", parameter);
             return existe ? "El correo ya existe" : string.Empty;
+        }
+        private async Task<string> ValidarIdExistente(int UsuarioID)
+        {
+            var parameter = new { UsuarioID };
+
+            var existe = await _sqlPort.ExecuteStoredProcedureBoolAsync("SP_Usuario_ExistePorID", parameter);
+            return !existe ? "El id del usuario es incorrecto" : string.Empty;
         }
     }
 

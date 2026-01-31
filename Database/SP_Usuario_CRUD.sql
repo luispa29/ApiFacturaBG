@@ -104,8 +104,9 @@ GO
 -- =============================================
 -- SP: Actualizar Usuario
 -- =============================================
+
 CREATE OR ALTER PROCEDURE SP_Usuario_Actualizar
-    @UsuarioID INT,
+    @Id INT,
     @Username NVARCHAR(50),
     @Nombre NVARCHAR(100),
     @Email NVARCHAR(100),
@@ -114,7 +115,6 @@ CREATE OR ALTER PROCEDURE SP_Usuario_Actualizar
     @NuevaContrasena NVARCHAR(255) = NULL
 AS
 BEGIN
-    SET NOCOUNT ON;
     
     IF @ActualizarContrasena = 1 AND @NuevaContrasena IS NOT NULL
     BEGIN
@@ -128,7 +128,7 @@ BEGIN
             Nombre = @Nombre,
             Email = @Email,
             Activo = @Activo
-        WHERE UsuarioID = @UsuarioID;
+        WHERE UsuarioID = @Id;
     END
     ELSE
     BEGIN
@@ -138,7 +138,7 @@ BEGIN
             Nombre = @Nombre,
             Email = @Email,
             Activo = @Activo
-        WHERE UsuarioID = @UsuarioID;
+        WHERE UsuarioID = @Id;
     END
     
     SELECT @@ROWCOUNT AS FilasAfectadas;
