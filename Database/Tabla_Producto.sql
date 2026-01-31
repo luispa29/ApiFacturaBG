@@ -5,3 +5,8 @@ CREATE TABLE dbo.Productos (
     StockActual INT NOT NULL DEFAULT 0,
     Activo BIT NOT NULL DEFAULT 1
 );
+
+CREATE INDEX IX_Producto_Nombre ON Productos(Nombre);
+CREATE INDEX IX_Producto_Activo ON Productos(Activo);
+
+GO
