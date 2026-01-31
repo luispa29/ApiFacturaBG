@@ -69,5 +69,33 @@ namespace ApiFacturaBG.Controllers
                 return StatusCode(500, RespuestaApi<object>.Error($"Error al eliminar producto: {ex.Message}"));
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(
+           [FromQuery] string? filtro = null,
+           [FromQuery] int numeroPagina = 1,
+           [FromQuery] int tamanoPagina = 10,
+           [FromQuery] bool soloActivos = true
+            )
+        {
+            try
+            {
+                var (productos, total) = await _productoSrvc.Obtener(numeroPagina, tamanoPagina, filtro, soloActivos);
+
+                var pagination = new
+                {
+                    Page = numeroPagina,
+                    PageSize = tamanoPagina,
+                    TotalRecords = total,
+                    TotalPages = (int)Math.Ceiling(total / (double)tamanoPagina)
+                };
+
+                return Ok(RespuestaApi<object>.ExitosaConPaginacion(productos, total, numeroPagina, tamanoPagina, "productos obtenidos exitosamente"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, RespuestaApi<object>.Error($"Error al obtener productos: {ex.Message}"));
+            }
+        }
     }
 }

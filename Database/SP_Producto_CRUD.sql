@@ -31,7 +31,8 @@ GO
 CREATE OR ALTER PROCEDURE SP_Producto_Listar
     @NumeroPagina INT = 1,
     @TamanoPagina INT = 10,
-    @Filtro NVARCHAR(200) = NULL
+    @Filtro NVARCHAR(200) = NULL,
+    @SoloActivos BIT = NULL
 AS
 BEGIN
     
@@ -41,11 +42,13 @@ BEGIN
         ProductoID,
         Nombre,
         PrecioUnitario,
-        StockActual
+        StockActual,
+        Activo
     FROM dbo.Productos
     WHERE 
         (@Filtro IS NULL OR 
          Nombre LIKE '%' + @Filtro + '%')
+        AND (@SoloActivos IS NULL OR Activo = @SoloActivos)
     ORDER BY ProductoID DESC
     OFFSET @Offset ROWS
     FETCH NEXT @TamanoPagina ROWS ONLY;
@@ -55,7 +58,8 @@ BEGIN
     FROM dbo.Productos
     WHERE 
         (@Filtro IS NULL OR 
-         Nombre LIKE '%' + @Filtro + '%');
+         Nombre LIKE '%' + @Filtro + '%')
+        AND (@SoloActivos IS NULL OR Activo = @SoloActivos);
 END
 GO
 

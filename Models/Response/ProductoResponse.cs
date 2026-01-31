@@ -6,5 +6,6 @@ namespace Models.Response
         public string Nombre { get; set; } = string.Empty;
         public decimal PrecioUnitario { get; set; }
         public int StockActual { get; set; }
+        public bool Activo { get; set; }
     }
 }
