@@ -1,7 +1,8 @@
 using Application.Ports.Driving;
+
 using Domain.Services;
+using Domain.UseCases;
 using MapSql.Extensions;
-using Microsoft.Extensions.Configuration;
 using Models.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddMapSql(builder.Configuration);
 
 
@@ -26,14 +28,15 @@ SecuritySettings securitySettings = new();
 configuration.GetSection("Security").Bind(securitySettings);
 
 
-// 2. Configuración de servicios
+//Configuración de servicios
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 // Inyección de dependencias - Servicios de Seguridad
 builder.Services.AddSingleton<IAesEncryptionService, AesEncryptionService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
 
-
+// Inyección de dependencias - Use Cases
+builder.Services.AddScoped<IUsuarioService, UsuarioUseCase>();
 
 builder.Services.AddCors(options =>
 {
