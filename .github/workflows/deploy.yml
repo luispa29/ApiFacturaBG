@@ -1,0 +1,73 @@
+name: Deploy to Somee
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore ./ApiFacturaBG/ApiFacturaBG.csproj
+
+      - name: Build
+        run: dotnet build ./ApiFacturaBG/ApiFacturaBG.csproj --configuration Release --no-restore
+
+      - name: Create appsettings.json from secret
+        run: |
+          echo '${{ secrets.APPSETTINGS_PRODUCTION }}' > ./ApiFacturaBG/appsettings.json
+        shell: bash
+
+      - name: Publish
+        run: dotnet publish ./ApiFacturaBG/ApiFacturaBG.csproj --configuration Release --output ./publish --no-build
+
+      - name: Prepare Stop Site
+        run: |
+          mkdir stop
+          echo "<html><body><h1>Actualizando sitio...</h1></body></html>" > stop/app_offline.htm
+        shell: bash
+
+      - name: Stop Site (Upload app_offline)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: 155.254.244.39
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          local-dir: ./stop/
+          server-dir: /www.facturatecnica.somee.com/
+          security: loose
+
+      - name: Wait for locks to release
+        run: sleep 5
+        shell: bash
+
+      - name: Deploy to Somee via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: 155.254.244.39
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          local-dir: ./publish/
+          server-dir: /www.facturatecnica.somee.com/
+          security: loose
+
+      - name: Start Site (Remove app_offline)
+        shell: pwsh
+        run: |
+          $ftp = [System.Net.FtpWebRequest]::Create("ftp://155.254.244.39/www.facturatecnica.somee.com/app_offline.htm")
+          $ftp.Method = [System.Net.WebRequestMethods+Ftp]::DeleteFile
+          $ftp.Credentials = New-Object System.Net.NetworkCredential("${{ secrets.FTP_USERNAME }}", "${{ secrets.FTP_PASSWORD }}")
+          try { $ftp.GetResponse() } catch { Write-Host "File already deleted or not found" }
